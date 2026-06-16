@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BooTo Shawarma - POS Terminal</title>
+    <!-- Google Fonts: Poppins & Bangers -->
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css?v=1.7">
+</head>
+<body>
+    <!-- 1. Splash Screen Overlay -->
+    <div id="splash-overlay" class="overlay">
+        <div class="splash-content">
+            <div class="splash-illustration">
+                <img src="images/booto_logo.png" class="splash-logo-img animated-logo" alt="Bootoo Shawarma Logo">
+            </div>
+            <h1 class="splash-logo">BOOTO</h1>
+            <h2 class="splash-sublogo">SHAWARMA POS</h2>
+            <div class="loader-container">
+                <div class="gold-spinner"></div>
+                <span class="loading-text">LOADING...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Admin Login Screen Overlay -->
+    <div id="login-overlay" class="overlay" style="display: none;">
+        <div class="login-card">
+            <h2>ADMIN LOGIN</h2>
+            <div class="login-error" id="login-error-msg" style="display: none;"></div>
+            
+            <div class="form-group">
+                <label>Enter Terminal Passcode</label>
+                <div class="pin-input-container">
+                    <input type="password" id="admin-pin" maxlength="4" placeholder="••••">
+                    <button class="toggle-pin-btn" id="toggle-pin-visibility" onclick="togglePinText()">
+                        <svg viewBox="0 0 24 24" class="eye-icon"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="remember-row">
+                <input type="checkbox" id="remember-me">
+                <label for="remember-me">Remember Me on this device</label>
+            </div>
+
+            <button class="btn btn-primary btn-block btn-login" onclick="verifyAdminLogin()">
+                UNLOCK TERMINAL
+            </button>
+            
+            <div class="login-info-note">
+                Default Credentials: Name: Admin | PIN: 1234
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container" id="app-main-layout" style="display: none;">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-title">BOOTO</span>
+                <span class="brand-subtitle">SHAWARMA POS</span>
+            </div>
+            
+            <div class="connection-status" id="ws-status">
+                <span class="status-indicator offline"></span>
+                <span class="status-text">Connecting...</span>
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="dashboard">
+                    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-tab="new-order">
+                    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    <span>New Order</span>
+                </button>
+                <button class="nav-item" data-tab="orders">
+                    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                    <span>Active Orders</span>
+                    <span class="badge" id="order-badge" style="display: none;">0</span>
+                </button>
+                <button class="nav-item" data-tab="sales">
+                    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                    <span>Sales & Reports</span>
+                </button>
+                <button class="nav-item" data-tab="menu">
+                    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8h2.5v-8H24V6c0-2.21-1.79-4-4-4S16 3.79 16 6z"/></svg>
+                    <span>Menu Catalog</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <span class="terminal-id">Terminal #01</span>
+                <span class="version">v1.2.0</span>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- 1. Dashboard Tab -->
+            <section id="dashboard" class="tab-content active">
+                <header class="section-header">
+                    <h1>POS Dashboard</h1>
+                    <button class="btn btn-secondary" onclick="refreshDashboardData()">
+                        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                        Sync
+                    </button>
+                </header>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-title">Today's Sales</span>
+                        <span class="stat-value" id="stat-revenue">₹0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-title">Total Orders</span>
+                        <span class="stat-value" id="stat-orders">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-title">Pending Queue</span>
+                        <span class="stat-value" id="stat-pending">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-title">Avg Ticket Size</span>
+                        <span class="stat-value" id="stat-avg">₹0</span>
+                    </div>
+                </div>
+
+                <!-- Graphs and Analytics -->
+                <div class="analytics-row">
+                    <div class="card chart-card">
+                        <h2>Sales Performance Today</h2>
+                        <div class="chart-container">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card top-items-card">
+                        <h2>Top Selling Items</h2>
+                        <ul class="top-items-list" id="top-items-list">
+                            <li class="loading-text">No reports loaded. Please start backend server.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. New Order Tab -->
+            <section id="new-order" class="tab-content">
+                <div class="checkout-scroll-container">
+                    <header class="section-header">
+                        <h1 class="checkout-header-title">NEW ORDER</h1>
+                        <span class="date-time" id="live-time"></span>
+                    </header>
+
+                    <!-- 1. Customer Details Card -->
+                    <div class="card checkout-details-card">
+                        <div class="card-header-mini">Customer Details</div>
+                        <div class="form-group-row">
+                            <input type="text" id="cust-name" placeholder="Customer Name">
+                            <input type="text" id="cust-mobile" placeholder="Mobile Number (Optional)">
+                        </div>
+                    </div>
+
+                    <!-- 2. Select Item Type Selection -->
+                    <div class="checkout-section-title">SELECT ITEM TYPE</div>
+                    <div class="item-type-row" id="checkout-item-types">
+                        <!-- 5 Categories of Shawarma selection -->
+                        <div class="type-card active" data-category="Shawarma">
+                            <div class="type-card-thumb wrap-thumb"><img src="images/shawarma_roll.png" alt="Shawarma Logo" class="type-card-img"></div>
+                            <span class="type-card-label">SHAWARMA</span>
+                        </div>
+                        <div class="type-card" data-category="Lays Shawarma">
+                            <div class="type-card-thumb lays-thumb"><img src="images/lays_logo.png" alt="Lays Logo" class="type-card-img"></div>
+                            <span class="type-card-label">LAYS SHAWARMA</span>
+                        </div>
+                        <div class="type-card" data-category="Plate Shawarma">
+                            <div class="type-card-thumb plate-thumb">🥗</div>
+                            <span class="type-card-label">PLATE SHAWARMA</span>
+                        </div>
+                        <div class="type-card" data-category="Mug Shawarma">
+                            <div class="type-card-thumb mug-thumb">🍲</div>
+                            <span class="type-card-label">MUG SHAWARMA</span>
+                        </div>
+                        <div class="type-card" data-category="Special Shawarma">
+                            <div class="type-card-thumb special-thumb">✨</div>
+                            <span class="type-card-label">SPECIAL SHAWARMA</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. Choose Variant Grid -->
+                    <div class="checkout-section-title" id="choose-variant-title">CHOOSE SHAWARMA TYPE</div>
+                    <div class="variant-grid" id="checkout-variant-grid">
+                        <!-- Variant cards populated dynamically -->
+                    </div>
+
+                    <!-- 4. Quantity Row -->
+                    <div class="checkout-form-row quantity-row">
+                        <div class="row-label">QUANTITY</div>
+                        <div class="quantity-controller">
+                            <button class="qty-btn" id="qty-minus">-</button>
+                            <span id="customizer-qty">1</span>
+                            <button class="qty-btn" id="qty-plus">+</button>
+                        </div>
+                    </div>
+
+                    <hr class="flat-divider">
+
+                    <!-- 5. Extras Checklist -->
+                    <div class="checkout-section-title">EXTRAS</div>
+                    <div class="extras-list-container" id="checkout-extras-list">
+                        <!-- Extras checkboxes populated dynamically -->
+                    </div>
+
+                    <hr class="flat-divider">
+
+                    <!-- 6. Special Instructions Note -->
+                    <div class="checkout-section-title">SPECIAL INSTRUCTIONS (Optional)</div>
+                    <div class="form-group">
+                        <input type="text" id="customizer-note" placeholder="Add special requests...">
+                    </div>
+
+                    <!-- 7. Order Cart Card (visible if cart not empty) -->
+                    <div class="card checkout-cart-card" id="cart-card-container" style="display: none;">
+                        <div class="checkout-section-title" id="cart-items-count-title">ORDER CART (0 ITEMS)</div>
+                        <div class="cart-items-scroll-list" id="cart-items-list">
+                            <!-- Items populated dynamically -->
+                        </div>
+                        
+                        <div class="order-mode-section">
+                            <div class="order-type-tabs">
+                                <button class="type-btn active" data-type="Dine In">Dine In</button>
+                                <button class="type-btn" data-type="Take Away">Take Away</button>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary btn-block btn-final-checkout" id="btn-submit-order" onclick="submitCartOrder()">
+                            PLACE ORDER (₹0)
+                        </button>
+                        
+                        <button class="btn-discard-order" onclick="clearCart()">
+                            Discard Order
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 8. Sticky Bottom Product Summary Card -->
+                <div class="sticky-summary-bar" id="sticky-summary-card" style="display: none;">
+                    <div class="sticky-bar-inner">
+                        <div class="sticky-bar-left">
+                            <div class="sticky-thumb-icon" id="sticky-item-icon">🌯</div>
+                            <div class="sticky-text-details">
+                                <div class="sticky-item-name" id="sticky-item-name">Classic shawarma</div>
+                                <div class="sticky-item-meta" id="sticky-item-meta">Qty: 1   Extras: 0</div>
+                            </div>
+                        </div>
+                        <div class="sticky-bar-right">
+                            <span class="sticky-item-price-sum" id="sticky-item-price-sum">₹90</span>
+                            <button class="btn btn-cancel-customizer" onclick="resetCustomizer()">CANCEL</button>
+                            <button class="btn btn-primary btn-add-customizer" onclick="addItemToCart()">ADD TO ORDER</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Active Orders Tab -->
+            <section id="orders" class="tab-content">
+                <header class="section-header">
+                    <h1>Incoming Orders Board</h1>
+                </header>
+
+                <div class="orders-board-layout">
+                    <!-- Pending Column -->
+                    <div class="board-column">
+                        <div class="column-header">
+                            <h2>Pending Requests</h2>
+                            <span class="column-count" id="pending-count-badge">0</span>
+                        </div>
+                        <div class="orders-list" id="pending-orders-list">
+                            <!-- Cards populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Ready Column -->
+                    <div class="board-column">
+                        <div class="column-header">
+                            <h2>Ready for Pickup</h2>
+                            <span class="column-count" id="ready-count-badge">0</span>
+                        </div>
+                        <div class="orders-list" id="ready-orders-list">
+                            <!-- Cards populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Sales & Transactions Tab -->
+            <section id="sales" class="tab-content">
+                <header class="section-header">
+                    <h1>Transaction History</h1>
+                </header>
+
+                <div class="card table-card">
+                    <table class="transaction-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Type</th>
+                                <th>Total Bill</th>
+                                <th>Status</th>
+                                <th>Date / Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transaction-table-body">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 5. Menu Directory Tab -->
+            <section id="menu" class="tab-content">
+                <header class="section-header">
+                    <h1>Menu Catalog</h1>
+                </header>
+
+                <div class="menu-catalog-container" id="menu-catalog-list">
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Chart.js Library for gorgeous graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="index.js?v=1.7"></script>
+</body>
+</html>
