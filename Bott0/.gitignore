@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+.npm-cache/
+backend/.npm-cache/
+/frontend/.pub-cache/
+/frontend/.dart_tool/
+/frontend/build/
+/frontend/.flutter-plugins
+/frontend/.flutter-plugins-dependencies
+
+# Local configuration and environment variables
+.env
+backend/.env
+
+# Local Databases & Logs
+*.db
+*.log
+backend/backups/
+
+# Editor and System files
+.DS_Store
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
