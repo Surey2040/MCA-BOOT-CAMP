@@ -74,11 +74,11 @@
             </div>
 
             <nav class="nav-menu">
-                <button class="nav-item active" data-tab="dashboard">
+                <button class="nav-item" data-tab="dashboard">
                     <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
                     <span>Dashboard</span>
                 </button>
-                <button class="nav-item" data-tab="new-order">
+                <button class="nav-item active" data-tab="new-order">
                     <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                     <span>New Order</span>
                 </button>
@@ -106,7 +106,7 @@
         <!-- Main Content Area -->
         <main class="main-content">
             <!-- 1. Dashboard Tab -->
-            <section id="dashboard" class="tab-content active">
+            <section id="dashboard" class="tab-content">
                 <header class="section-header">
                     <h1>POS Dashboard</h1>
                     <button class="btn btn-secondary" onclick="refreshDashboardData()">
@@ -153,7 +153,7 @@
             </section>
 
             <!-- 2. New Order Tab -->
-            <section id="new-order" class="tab-content">
+            <section id="new-order" class="tab-content active">
                 <div class="checkout-scroll-container">
                     <header class="section-header">
                         <h1 class="checkout-header-title">NEW ORDER</h1>

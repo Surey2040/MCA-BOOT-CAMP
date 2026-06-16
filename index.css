@@ -1695,7 +1695,7 @@ body::after {
 }
 
 /* Adjust viewport size of checkout page on narrower width */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .sticky-summary-bar {
         left: 0;
     }
@@ -1726,7 +1726,7 @@ body::after {
 }
 
 /* Responsive Mobile Layout rules */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .sidebar-toggle-btn {
         display: flex;
     }
