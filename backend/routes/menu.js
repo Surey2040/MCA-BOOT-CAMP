@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
     });
     res.json(items);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch menu items' });
+    res.status(500).json({ error: 'Failed to fetch menu items', details: error.message, stack: error.stack });
   }
 });
 
