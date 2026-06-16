@@ -1668,3 +1668,73 @@ body::after {
     }
 }
 
+/* Sidebar Toggle Button for Mobile */
+.sidebar-toggle-btn {
+    display: none;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 100;
+    background-color: rgba(26, 26, 26, 0.9);
+    border: 1px solid var(--border-color);
+    color: var(--accent);
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-toggle-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
+/* Responsive Mobile Layout rules */
+@media (max-width: 768px) {
+    .sidebar-toggle-btn {
+        display: flex;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: -260px;
+        transition: left 0.3s ease-in-out;
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+
+    .main-content {
+        padding: 76px 16px 24px 16px; /* Space on top for the floating hamburger button */
+        width: 100vw;
+    }
+
+    .analytics-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .order-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+
+    .orders-board-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+}
+
+
+
+
+
+
+

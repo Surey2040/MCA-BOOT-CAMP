@@ -124,6 +124,12 @@ function initNavigation() {
             });
             document.getElementById(tabId).classList.add('active');
 
+            // Close sidebar on mobile after clicking item
+            const sidebar = document.getElementById('app-sidebar');
+            if (sidebar) {
+                sidebar.classList.remove('open');
+            }
+
             // Hook chart resizing or reloading on tab changes
             if (tabId === 'dashboard') {
                 refreshDashboardData();
@@ -928,4 +934,11 @@ function renderSeededDashboardMockup() {
         { hour: 17, sales: 2900 }
     ];
     renderSalesLineChart(mockHourlySales);
+}
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('app-sidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('open');
+    }
 }

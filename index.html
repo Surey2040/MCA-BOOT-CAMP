@@ -56,8 +56,13 @@
     </div>
 
     <div class="app-container" id="app-main-layout" style="display: none;">
+        <!-- Hamburger Menu for Mobile -->
+        <button id="sidebar-toggle" class="sidebar-toggle-btn" onclick="toggleSidebar()">
+            <svg viewBox="0 0 24 24" class="hamburger-icon"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        </button>
+
         <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="app-sidebar">
             <div class="brand">
                 <span class="brand-title">BOOTO</span>
                 <span class="brand-subtitle">SHAWARMA POS</span>
