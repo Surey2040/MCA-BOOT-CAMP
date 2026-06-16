@@ -3,16 +3,22 @@
    ========================================================================== */
 
 :root {
-    --bg-primary: #0D0D0D;
-    --bg-secondary: #1A1A1A;
-    --accent: #F5A623;
-    --accent-hover: #D58F18;
+    --bg-primary: #0A0A0A;
+    --bg-secondary: #141414;
+    --bg-elevated: #1E1E1E;
+    --accent: #FFD700;
+    --accent-hover: #FF6B00;
+    --accent-light: #FFE55C;
+    --accent-dark: #B8860B;
+    --accent-amber: #FFA500;
     --text-white: #FFFFFF;
-    --text-muted: #AAAAAA;
-    --success: #4CAF50;
-    --danger: #E53935;
-    --border-color: #2A2A2A;
+    --text-muted: #A0A0A0;
+    --success: #00C853;
+    --danger: #FF1744;
+    --border-color: #222222;
     --sidebar-width: 260px;
+    --gold-gradient: linear-gradient(135deg, #FFD700, #FF6B00);
+    --card-gradient: linear-gradient(135deg, #1E1E1E, #141414);
 }
 
 * {
@@ -87,12 +93,12 @@ body::after {
 }
 
 .brand-title {
-    font-family: 'Bangers', cursive;
-    font-size: 38px;
-    font-weight: 400;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    font-weight: bold;
     color: var(--accent);
-    letter-spacing: 2px;
-    line-height: 1;
+    letter-spacing: 4px;
+    line-height: 1.1;
 }
 
 .brand-subtitle {
@@ -220,8 +226,11 @@ body::after {
 }
 
 .section-header h1 {
-    font-size: 28px;
-    font-weight: 800;
+    font-family: 'Poppins', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
     color: var(--text-white);
 }
 
@@ -235,7 +244,7 @@ body::after {
    Utility Cards & Buttons
    ========================================================================== */
 .card {
-    background-color: var(--bg-secondary);
+    background: var(--card-gradient);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 24px;
@@ -244,7 +253,7 @@ body::after {
 
 .btn {
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
@@ -252,37 +261,56 @@ body::after {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 10px 18px;
+    padding: 12px 20px;
     transition: all 0.25s ease;
 }
 
 .btn-primary {
-    background-color: var(--accent);
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
     color: var(--bg-primary);
 }
 
 .btn-primary:hover {
-    background-color: var(--accent-hover);
+    filter: brightness(1.15);
 }
 
 .btn-secondary {
-    background-color: rgba(255, 255, 255, 0.05);
-    color: var(--text-white);
+    background-color: transparent;
+    color: var(--text-muted);
     border: 1px solid var(--border-color);
 }
 
 .btn-secondary:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.03);
 }
 
 .btn-danger {
-    background-color: transparent;
+    background-color: rgba(255, 23, 68, 0.08);
     color: var(--danger);
     border: 1px solid var(--danger);
 }
 
 .btn-danger:hover {
-    background-color: rgba(229, 57, 53, 0.08);
+    background-color: rgba(255, 23, 68, 0.15);
+}
+
+.btn-ready {
+    background-color: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent-dark);
+}
+
+.btn-ready:hover {
+    background-color: rgba(184, 134, 11, 0.1);
+}
+
+.btn-success {
+    background-color: var(--success);
+    color: var(--text-white);
+}
+
+.btn-success:hover {
+    filter: brightness(1.1);
 }
 
 .btn-block {
@@ -312,7 +340,7 @@ body::after {
 }
 
 .stat-card {
-    background-color: var(--bg-secondary);
+    background: var(--card-gradient);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 24px;
@@ -329,9 +357,10 @@ body::after {
 }
 
 .stat-value {
-    font-size: 28px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
     font-weight: 800;
-    color: var(--text-white);
+    color: var(--accent);
     margin-top: 10px;
 }
 
@@ -697,8 +726,10 @@ body::after {
 }
 
 .total-row span:last-child {
+    font-family: 'Poppins', sans-serif;
     color: var(--accent);
-    font-size: 17px;
+    font-size: 24px;
+    font-weight: 800;
 }
 
 .order-type-tabs {
@@ -776,7 +807,7 @@ body::after {
 }
 
 .order-board-card {
-    background-color: var(--bg-secondary);
+    background: var(--card-gradient);
     border: 1px solid var(--border-color);
     border-radius: 10px;
     padding: 16px;
@@ -795,9 +826,11 @@ body::after {
 }
 
 .order-id {
-    font-size: 15px;
-    font-weight: 800;
-    color: var(--accent);
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--accent-amber);
 }
 
 .badge-status {
@@ -906,7 +939,7 @@ body::after {
 }
 
 .catalog-category {
-    background-color: var(--bg-secondary);
+    background: var(--card-gradient);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 24px;

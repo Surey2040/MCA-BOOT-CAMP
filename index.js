@@ -726,13 +726,13 @@ function createOrderBoardCard(order) {
     let actionBtnHtml = '';
     if (order.status === 'pending') {
         actionBtnHtml = `
-            <button class="btn btn-primary" onclick="updateOrderStatus('${order.id}', 'ready')">MARK READY</button>
-            <button class="btn btn-danger" onclick="updateOrderStatus('${order.id}', 'cancelled')">CANCEL</button>
+            <button class="btn btn-ready" onclick="updateOrderStatus('${order.id}', 'ready')">✓ MARK READY</button>
+            <button class="btn btn-danger" onclick="updateOrderStatus('${order.id}', 'cancelled')">✕ CANCEL</button>
         `;
     } else if (order.status === 'ready') {
         actionBtnHtml = `
-            <button class="btn btn-primary" onclick="updateOrderStatus('${order.id}', 'completed')">DELIVER / COMPLETE</button>
-            <button class="btn btn-danger" onclick="updateOrderStatus('${order.id}', 'cancelled')">CANCEL</button>
+            <button class="btn btn-success" onclick="updateOrderStatus('${order.id}', 'completed')">✓ DELIVER / COMPLETE</button>
+            <button class="btn btn-danger" onclick="updateOrderStatus('${order.id}', 'cancelled')">✕ CANCEL</button>
         `;
     }
 
