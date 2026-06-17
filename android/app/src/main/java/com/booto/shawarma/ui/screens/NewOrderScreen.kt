@@ -198,8 +198,8 @@ fun NewOrderScreen(
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
             } else {
-                // Display items in structured grid rows of 3
-                val chunked = filteredItems.chunked(3)
+                // Display items in structured grid rows of 2
+                val chunked = filteredItems.chunked(2)
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -238,15 +238,16 @@ fun NewOrderScreen(
                                         Text(
                                             text = item.name,
                                             color = Color.White,
-                                            fontSize = 11.sp,
+                                            fontSize = 12.sp,
                                             fontWeight = FontWeight.Bold,
                                             textAlign = TextAlign.Center,
-                                            maxLines = 1
+                                            maxLines = 1,
+                                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                         )
                                         Text(
                                             text = "₹${item.price.toInt()}",
                                             color = GoldAccent,
-                                            fontSize = 12.sp,
+                                            fontSize = 13.sp,
                                             fontWeight = FontWeight.Bold
                                         )
                                     }
@@ -271,8 +272,8 @@ fun NewOrderScreen(
                                 }
                             }
                             // Pad remaining cells if chunk is incomplete
-                            if (rowItems.size < 3) {
-                                repeat(3 - rowItems.size) {
+                            if (rowItems.size < 2) {
+                                repeat(2 - rowItems.size) {
                                     Spacer(modifier = Modifier.weight(1f))
                                 }
                             }
@@ -546,18 +547,18 @@ fun NewOrderScreen(
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
             ) {
-                Row(
+                Column(
                     modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    // Item Info Row
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1.2f)
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(42.dp)
+                                .size(40.dp)
                                 .background(Color(0xFF222222), RoundedCornerShape(8.dp)),
                             contentAlignment = Alignment.Center
                         ) {
@@ -571,26 +572,33 @@ fun NewOrderScreen(
                             )
                         }
                         Spacer(modifier = Modifier.width(10.dp))
-                        Column {
+                        Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = item.name,
                                 color = Color.White,
-                                fontSize = 13.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
-                                maxLines = 1
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                             )
                             Text(
                                 text = "Qty: $quantity   Extras: ${selectedExtras.size}",
                                 color = TextMuted,
-                                fontSize = 11.sp
+                                fontSize = 12.sp
                             )
                         }
+                        Text(
+                            text = "₹${totalItemCost.toInt()}",
+                            color = GoldAccent,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
 
+                    // Action Buttons Row
                     Row(
-                        modifier = Modifier.weight(1.8f),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Button(
                             onClick = {
@@ -603,10 +611,11 @@ fun NewOrderScreen(
                             border = BorderStroke(1.dp, Color.Red),
                             shape = RoundedCornerShape(8.dp),
                             modifier = Modifier
-                                .padding(right = 8.dp)
-                                .height(40.dp)
+                                .weight(1f)
+                                .height(42.dp),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                         ) {
-                            Text("CANCEL", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            Text("CANCEL", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                         
                         Button(
@@ -619,9 +628,12 @@ fun NewOrderScreen(
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = GoldAccent),
                             shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier.height(40.dp)
+                            modifier = Modifier
+                                .weight(1.5f)
+                                .height(42.dp),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                         ) {
-                            Text("ADD TO ORDER", color = Color.Black, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            Text("ADD TO ORDER", color = Color.Black, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
