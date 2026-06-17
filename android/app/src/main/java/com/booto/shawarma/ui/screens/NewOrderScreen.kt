@@ -57,7 +57,6 @@ fun NewOrderScreen(
     val chunkedItems = remember(filteredItems) {
         filteredItems.chunked(2)
     }
-    val isKeyboardOpen = WindowInsets.ime.calculateBottomPadding() > 0.dp
     val scrollState = rememberScrollState()
 
     Box(
@@ -540,7 +539,7 @@ fun NewOrderScreen(
         }
 
         // 8. Sticky Bottom Product Summary Card
-        if (selectedItem != null && !isKeyboardOpen) {
+        if (selectedItem != null) {
             val item = selectedItem!!
             val extrasCost = selectedExtras.sumOf { it.price }
             val totalItemCost = (item.price + extrasCost) * quantity
