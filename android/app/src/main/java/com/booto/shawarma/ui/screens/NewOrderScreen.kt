@@ -51,7 +51,13 @@ fun NewOrderScreen(
     var customerNameInput by remember { mutableStateOf("") }
     var customerMobileInput by remember { mutableStateOf("") }
 
-    val filteredItems = menuItems.filter { it.category == selectedCategory }
+    val filteredItems = remember(menuItems, selectedCategory) {
+        menuItems.filter { it.category == selectedCategory }
+    }
+    val chunkedItems = remember(filteredItems) {
+        filteredItems.chunked(2)
+    }
+    val isKeyboardOpen = WindowInsets.ime.calculateBottomPadding() > 0.dp
     val scrollState = rememberScrollState()
 
     Box(
@@ -199,7 +205,7 @@ fun NewOrderScreen(
                 )
             } else {
                 // Display items in structured grid rows of 2
-                val chunked = filteredItems.chunked(2)
+                val chunked = chunkedItems
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -534,7 +540,8 @@ fun NewOrderScreen(
         }
 
         // 8. Sticky Bottom Product Summary Card
-        selectedItem?.let { item ->
+        if (selectedItem != null && !isKeyboardOpen) {
+            val item = selectedItem!!
             val extrasCost = selectedExtras.sumOf { it.price }
             val totalItemCost = (item.price + extrasCost) * quantity
 
