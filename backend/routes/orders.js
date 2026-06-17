@@ -1,5 +1,6 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
+import crypto from 'crypto';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -8,26 +9,38 @@ const prisma = new PrismaClient();
 router.get('/', async (req, res) => {
   try {
     const orders = await prisma.order.findMany({
-      include: { items: true },
+      include: {
+        items: {
+          include: { menuItem: true }
+        }
+      },
       orderBy: { createdAt: 'desc' }
     });
     
-    // Parse SQLite stringified extras back to JSON array
-    const parsedOrders = orders.map(order => ({
-      ...order,
-      items: order.items.map(item => {
-        let parsedExtras = [];
-        try {
-          parsedExtras = typeof item.extras === 'string' ? JSON.parse(item.extras) : item.extras;
-        } catch (e) {
-          parsedExtras = [];
-        }
-        return { ...item, extras: parsedExtras };
-      })
+    // Format response to match client expectation
+    const formattedOrders = orders.map(order => ({
+      id: order.id,
+      customerId: order.customerId,
+      type: order.orderType,
+      status: order.status,
+      total: parseFloat(order.total),
+      note: order.items[0]?.specialInstructions || '',
+      createdAt: order.createdAt,
+      updatedAt: order.updatedAt,
+      items: order.items.map(item => ({
+        id: item.id,
+        orderId: item.orderId,
+        menuItemId: item.menuItemId,
+        itemName: item.menuItem ? item.menuItem.name : 'Unknown',
+        quantity: item.quantity,
+        price: parseFloat(item.price),
+        extras: typeof item.extras === 'string' ? JSON.parse(item.extras) : item.extras
+      }))
     }));
 
-    res.json(parsedOrders);
+    res.json(formattedOrders);
   } catch (error) {
+    console.error('Failed to fetch orders:', error);
     res.status(500).json({ error: 'Failed to fetch orders' });
   }
 });
@@ -37,18 +50,17 @@ router.post('/', async (req, res) => {
   try {
     const { type, total, note, items, customerName, customerMobile } = req.body;
 
-    // 1. Get next order ID (ORD1001...)
-    const lastOrder = await prisma.order.findFirst({
-      orderBy: { id: 'desc' }
-    });
-    let nextIdNumber = 1001;
-    if (lastOrder && lastOrder.id.startsWith('ORD')) {
-      const lastNum = parseInt(lastOrder.id.substring(3));
-      if (!isNaN(lastNum)) {
-        nextIdNumber = lastNum + 1;
+    // 1. Generate clean sequential Order Number (e.g. ORDYYMMDD-XXXX)
+    const todayCount = (await prisma.order.count({
+      where: {
+        createdAt: {
+          gte: new Date(new Date().setHours(0, 0, 0, 0))
+        }
       }
-    }
-    const orderId = `ORD${nextIdNumber}`;
+    })) + 1;
+    const formattedDate = new Date().toISOString().slice(2, 10).replace(/-/g, '');
+    const orderNumber = `ORD${formattedDate}-${todayCount.toString().padStart(4, '0')}`;
+    const orderId = `ORD${Date.now()}`;
 
     // 2. Associate customer if details provided
     let customerId = null;
@@ -72,44 +84,57 @@ router.post('/', async (req, res) => {
       data: {
         id: orderId,
         customerId,
-        type,
-        status: 'pending',
+        orderNumber,
+        orderType: type || 'Dine In',
+        subtotal: parseFloat(total),
+        discount: 0.00,
         total: parseFloat(total),
-        note,
+        status: 'pending',
         items: {
           create: items.map(item => ({
+            id: `OI-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
             menuItemId: parseInt(item.menuItemId),
-            itemName: item.itemName,
             quantity: parseInt(item.quantity),
             price: parseFloat(item.price),
-            extras: JSON.stringify(item.extras || [])
+            extras: item.extras || [],
+            specialInstructions: note || ''
           }))
         }
       },
-      include: { items: true }
+      include: {
+        items: {
+          include: { menuItem: true }
+        }
+      }
     });
 
-    // Parse SQLite stringified extras back to JSON array for frontend/socket compatibility
-    const parsedOrder = {
-      ...newOrder,
-      items: newOrder.items.map(item => {
-        let parsedExtras = [];
-        try {
-          parsedExtras = typeof item.extras === 'string' ? JSON.parse(item.extras) : item.extras;
-        } catch (e) {
-          parsedExtras = [];
-        }
-        return { ...item, extras: parsedExtras };
-      })
+    const formattedOrder = {
+      id: newOrder.id,
+      customerId: newOrder.customerId,
+      type: newOrder.orderType,
+      status: newOrder.status,
+      total: parseFloat(newOrder.total),
+      note: newOrder.items[0]?.specialInstructions || '',
+      createdAt: newOrder.createdAt,
+      updatedAt: newOrder.updatedAt,
+      items: newOrder.items.map(item => ({
+        id: item.id,
+        orderId: item.orderId,
+        menuItemId: item.menuItemId,
+        itemName: item.menuItem ? item.menuItem.name : 'Unknown',
+        quantity: item.quantity,
+        price: parseFloat(item.price),
+        extras: item.extras
+      }))
     };
 
     // 4. Broadcast via WebSocket
     const broadcast = req.app.get('broadcast');
     if (broadcast) {
-      broadcast({ type: 'ORDER_CREATED', order: parsedOrder });
+      broadcast({ type: 'ORDER_CREATED', order: formattedOrder });
     }
 
-    res.status(201).json(parsedOrder);
+    res.status(201).json(formattedOrder);
   } catch (error) {
     console.error('Error creating order:', error);
     res.status(500).json({ error: 'Failed to create order' });
@@ -125,31 +150,42 @@ router.put('/:id/status', async (req, res) => {
     const updatedOrder = await prisma.order.update({
       where: { id },
       data: { status },
-      include: { items: true }
+      include: {
+        items: {
+          include: { menuItem: true }
+        }
+      }
     });
 
-    // Parse SQLite stringified extras back to JSON array
-    const parsedOrder = {
-      ...updatedOrder,
-      items: updatedOrder.items.map(item => {
-        let parsedExtras = [];
-        try {
-          parsedExtras = typeof item.extras === 'string' ? JSON.parse(item.extras) : item.extras;
-        } catch (e) {
-          parsedExtras = [];
-        }
-        return { ...item, extras: parsedExtras };
-      })
+    const formattedOrder = {
+      id: updatedOrder.id,
+      customerId: updatedOrder.customerId,
+      type: updatedOrder.orderType,
+      status: updatedOrder.status,
+      total: parseFloat(updatedOrder.total),
+      note: updatedOrder.items[0]?.specialInstructions || '',
+      createdAt: updatedOrder.createdAt,
+      updatedAt: updatedOrder.updatedAt,
+      items: updatedOrder.items.map(item => ({
+        id: item.id,
+        orderId: item.orderId,
+        menuItemId: item.menuItemId,
+        itemName: item.menuItem ? item.menuItem.name : 'Unknown',
+        quantity: item.quantity,
+        price: parseFloat(item.price),
+        extras: item.extras
+      }))
     };
 
     // Broadcast update via WebSocket
     const broadcast = req.app.get('broadcast');
     if (broadcast) {
-      broadcast({ type: 'ORDER_STATUS_UPDATED', order: parsedOrder });
+      broadcast({ type: 'ORDER_STATUS_UPDATED', order: formattedOrder });
     }
 
-    res.json(parsedOrder);
+    res.json(formattedOrder);
   } catch (error) {
+    console.error('Failed to update order status:', error);
     res.status(500).json({ error: 'Failed to update order status' });
   }
 });

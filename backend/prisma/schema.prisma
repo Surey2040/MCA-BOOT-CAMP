@@ -7,43 +7,89 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  pinHash   String   @map("pin_hash")
+  role      String   @default("staff")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}
+
+model Category {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  slug      String     @unique
+  menuItems MenuItem[]
+
+  @@map("categories")
+}
+
+model MenuItem {
+  id          Int         @id @default(autoincrement())
+  categoryId  Int?        @map("category_id")
+  category    Category?   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name        String      @unique
+  price       Decimal     @db.Decimal(10, 2)
+  description String?
+  imageUrl    String?     @map("image_url")
+  isAvailable Boolean     @default(true) @map("is_available")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  orderItems  OrderItem[]
+
+  @@map("menu_items")
+}
+
 model Customer {
   id        Int      @id @default(autoincrement())
   name      String
   mobile    String?  @unique
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
   orders    Order[]
-}
 
-model MenuItem {
-  id        Int      @id @default(autoincrement())
-  category  String
-  name      String   @unique
-  price     Float
-  imageUrl  String?
-  createdAt DateTime @default(now())
+  @@map("customers")
 }
 
 model Order {
-  id         String      @id
-  customerId Int?
-  customer   Customer?   @relation(fields: [customerId], references: [id])
-  type       String      
-  status     String      
-  total      Float
-  note       String?
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  items      OrderItem[]
+  id          String      @id
+  customerId  Int?        @map("customer_id")
+  customer    Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  orderNumber String      @unique @map("order_number")
+  orderType   String      @default("Dine In") @map("order_type")
+  subtotal    Decimal     @db.Decimal(10, 2)
+  discount    Decimal     @default(0.00) @db.Decimal(10, 2)
+  total       Decimal     @db.Decimal(10, 2)
+  status      String      @default("pending")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @default(now()) @updatedAt @map("updated_at")
+  items       OrderItem[]
+
+  @@map("orders")
 }
 
 model OrderItem {
-  id         Int      @id @default(autoincrement())
-  orderId    String
-  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  menuItemId Int
-  itemName   String
-  quantity   Int
-  price      Float
-  extras     String   @default("[]") 
+  id                  String    @id
+  orderId             String?   @map("order_id")
+  order               Order?    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId          Int?      @map("menu_item_id")
+  menuItem            MenuItem? @relation(fields: [menuItemId], references: [id], onDelete: SetNull)
+  quantity            Int
+  price               Decimal   @db.Decimal(10, 2)
+  extras              Json      @default("[]")
+  specialInstructions String?   @map("special_instructions")
+  createdAt           DateTime  @default(now()) @map("created_at")
+
+  @@map("order_items")
+}
+
+model SalesReport {
+  id               Int      @id @default(autoincrement())
+  reportDate       DateTime @unique @map("report_date") @db.Date
+  totalOrders      Int      @default(0) @map("total_orders")
+  totalRevenue     Decimal  @default(0.00) @map("total_revenue") @db.Decimal(10, 2)
+  topSellingItem   String?  @map("top_selling_item")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@map("sales_reports")
 }

@@ -36,7 +36,6 @@ router.get('/', async (req, res) => {
     });
 
     // 2. Hourly Sales distribution (for the dashboard line chart)
-    // We group today's orders by hour (0-23)
     const hourlySalesMap = Array.from({ length: 24 }, (_, i) => ({ hour: i, sales: 0.0 }));
     todayOrders.forEach(order => {
       const hour = new Date(order.createdAt).getHours();
@@ -53,16 +52,20 @@ router.get('/', async (req, res) => {
           },
           status: { not: 'cancelled' }
         }
+      },
+      include: {
+        menuItem: true
       }
     });
 
     const itemTotals = {};
     orderItems.forEach(item => {
-      if (!itemTotals[item.itemName]) {
-        itemTotals[item.itemName] = { quantity: 0, revenue: 0 };
+      const name = item.menuItem ? item.menuItem.name : 'Unknown Item';
+      if (!itemTotals[name]) {
+        itemTotals[name] = { quantity: 0, revenue: 0 };
       }
-      itemTotals[item.itemName].quantity += item.quantity;
-      itemTotals[item.itemName].revenue += parseFloat(item.price) * item.quantity;
+      itemTotals[name].quantity += item.quantity;
+      itemTotals[name].revenue += parseFloat(item.price) * item.quantity;
     });
 
     const topItems = Object.entries(itemTotals)

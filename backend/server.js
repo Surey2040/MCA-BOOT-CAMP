@@ -67,9 +67,10 @@ wss.on('connection', (ws) => {
 // Pre-seeding database values if empty
 const seedDatabase = async () => {
   try {
-    // Clear old menu items to ensure they match the menu card exactly
+    // Clear old menu items and categories to ensure they match the menu card exactly
     await prisma.menuItem.deleteMany();
-    console.log('Cleared database menu items.');
+    await prisma.category.deleteMany();
+    console.log('Cleared database menu items and categories.');
 
     console.log('Seeding menu items to PostgreSQL database...');
     const items = [
@@ -118,7 +119,25 @@ const seedDatabase = async () => {
     ];
 
     for (const item of items) {
-      await prisma.menuItem.create({ data: item });
+      let dbCategory = await prisma.category.findFirst({
+        where: { name: item.category }
+      });
+      if (!dbCategory) {
+        dbCategory = await prisma.category.create({
+          data: {
+            name: item.category,
+            slug: item.category.toLowerCase().replace(/ /g, '-')
+          }
+        });
+      }
+      await prisma.menuItem.create({
+        data: {
+          categoryId: dbCategory.id,
+          name: item.name,
+          price: item.price,
+          imageUrl: item.imageUrl || null
+        }
+      });
     }
     console.log('Seeding completed successfully!');
   } catch (err) {
